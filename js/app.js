@@ -861,7 +861,7 @@ function placePop(pop, rect) {
   let y = rect.bottom + 10;
   if (y + ph > innerHeight - 70) y = rect.top - ph - 10;
   x = Math.max(8, Math.min(innerWidth - pw - 8, x));
-  y = Math.max(8, y);
+  y = Math.max(8, Math.min(innerHeight - ph - 8, y));
   pop.style.left = x + 'px';
   pop.style.top = y + 'px';
 }
@@ -1699,12 +1699,13 @@ async function boot() {
   applySettings();
   bind();
   bindInkbar();
-  const hashLaw = (location.hash.match(/^#([a-z-]+)/) || [])[1];
-  const legacy = /^#a-\d/.test(location.hash);
-  const first = legacy ? 'civil' : entry(hashLaw) ? hashLaw : entry(settings.law) ? settings.law : DEFAULT_LAW;
-  await openLaw(first);
+  const h = decodeURIComponent(location.hash.slice(1));
+  let m = h.match(/^a-(\d+(?:-\d+)?)$/);
+  let first = entry(settings.law) ? settings.law : DEFAULT_LAW, aid;
+  if (m) { first = 'civil'; aid = m[1]; }
+  else if ((m = h.match(/^([a-z-]+)(?:\/(\d+(?:-\d+)?))?$/)) && entry(m[1])) { first = m[1]; aid = m[2]; }
+  await openLaw(first, { aid });
   doSearch('');
-  routeHash(true);
   store.persist();
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
     navigator.serviceWorker.register('sw.js').catch(() => {});

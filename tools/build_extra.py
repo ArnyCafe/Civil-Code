@@ -313,6 +313,17 @@ def judgments(osh):
     return judg, interp
 
 
+def update_index():
+    """在 data/laws.json 標註有附加資料之法典"""
+    p = os.path.join(ROOT, "data", "laws.json")
+    idx = json.load(open(p, encoding="utf-8"))
+    for e in idx["laws"]:
+        if os.path.exists(os.path.join(ROOT, "data", "extra", e["id"] + ".json")):
+            e["extra"] = "data/extra/%s.json" % e["id"]
+    with open(p, "w", encoding="utf-8") as f:
+        json.dump(idx, f, ensure_ascii=False, indent=1)
+
+
 def main():
     lib, laws = load_lib()
     build_xref(lib, laws)
@@ -335,6 +346,7 @@ def main():
     os.makedirs(os.path.join(ROOT, "data", "extra"), exist_ok=True)
     with open(os.path.join(ROOT, "data", "extra", "osh.json"), "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
+    update_index()
     print("→ data/extra/osh.json %.0f KB" % (os.path.getsize(os.path.join(ROOT, "data", "extra", "osh.json")) / 1024))
 
 

@@ -680,7 +680,7 @@ button.hl-n { background: var(--page); color: var(--gloss); font-size: 12px; }
 .toc-law b { display: block; font: 700 15px/1.35 var(--font-law); }
 .toc-law small { color: var(--faint); font-size: 12px; }
 .toc-law a { color: var(--accent); }
-.cdot { width: 9px; height: 9px; border-radius: 3px; flex: none; align-self: center; }
+.cdot { display: inline-block; width: 9px; height: 9px; border-radius: 3px; flex: none; align-self: center; }
 .shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
 .shelf-it { display: flex; flex-direction: column; gap: 2px; text-align: left; border: 1px solid var(--line); background: var(--raise); border-radius: 10px; padding: 9px 12px; }
 .shelf-it b { font: 600 15px/1.35 var(--font-law); }
@@ -714,3 +714,10 @@ button.hl-n { background: var(--page); color: var(--gloss); font-size: 12px; }
   .mine-ind, .chips { display: none !important; }
   .ano { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
+
+/* 款次（含「十一、」以上）不斷行 */
+.para.kuan { grid-template-columns: 1.6em max-content minmax(0,1fr); }
+.para.sub { grid-template-columns: 1.6em max-content minmax(0,1fr); }
+.no-pn .para.kuan, .no-pn .para.sub { grid-template-columns: 0 max-content minmax(0,1fr); }
+.kn { white-space: nowrap; min-width: 2.2em; }
+.para.sub .kn { min-width: 3.6em; }

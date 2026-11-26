@@ -149,7 +149,7 @@ export class Ink {
     for (let i = 3; i < p.length; i += 3) {
       const last = i + 3 >= p.length;
       const mx = last ? X(i) : (X(i) + X(i + 3)) / 2;
-      const my = last ? Y(i) : (Y(i + 1) + Y(i + 4)) / 2;
+      const my = last ? Y(i) : (Y(i) + Y(i + 3)) / 2;
       ctx.lineWidth = width((p[i + 2] + p[i - 1]) / 2);
       ctx.beginPath();
       ctx.moveTo(px, py);

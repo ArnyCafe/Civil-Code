@@ -382,7 +382,7 @@ def color_headings(lid, headings):
     custom = curated_osh.CHAPTER_COLORS if lid == "osh" else {}
     i = 0
     for h in headings:
-        if h["lv"] == 0:
+        if h["p"] < 0:
             key = None
             for k, c in custom.items():
                 if h["t"].startswith(k):
