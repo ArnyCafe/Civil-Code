@@ -1,0 +1,230 @@
+{
+ "default": "osh",
+ "laws": [
+  {
+   "id": "osh",
+   "pcode": "N0060001",
+   "name": "職業安全衛生法",
+   "short": "職安法",
+   "alias": [
+    "職業安全衛生法",
+    "職安法"
+   ],
+   "group": "職業安全衛生",
+   "kind": "法律",
+   "modified": "20251219",
+   "n": 61,
+   "file": "data/law/osh.json",
+   "extra": "data/extra/osh.json"
+  },
+  {
+   "id": "osh-r",
+   "pcode": "N0060002",
+   "name": "職業安全衛生法施行細則",
+   "short": "職安法細則",
+   "alias": [
+    "職業安全衛生法施行細則"
+   ],
+   "group": "職業安全衛生",
+   "kind": "命令",
+   "modified": "20260626",
+   "n": 56,
+   "file": "data/law/osh-r.json",
+   "parent": "osh"
+  },
+  {
+   "id": "osh-fac",
+   "pcode": "N0060009",
+   "name": "職業安全衛生設施規則",
+   "short": "設施規則",
+   "alias": [
+    "職業安全衛生設施規則"
+   ],
+   "group": "職業安全衛生",
+   "kind": "命令",
+   "modified": "20260630",
+   "n": 391,
+   "file": "data/law/osh-fac.json",
+   "parent": "osh"
+  },
+  {
+   "id": "osh-mgmt",
+   "pcode": "N0060027",
+   "name": "職業安全衛生管理辦法",
+   "short": "管理辦法",
+   "alias": [
+    "職業安全衛生管理辦法"
+   ],
+   "group": "職業安全衛生",
+   "kind": "命令",
+   "modified": "20260629",
+   "n": 107,
+   "file": "data/law/osh-mgmt.json",
+   "parent": "osh"
+  },
+  {
+   "id": "osh-edu",
+   "pcode": "N0060010",
+   "name": "職業安全衛生教育訓練規則",
+   "short": "教育訓練規則",
+   "alias": [
+    "職業安全衛生教育訓練規則"
+   ],
+   "group": "職業安全衛生",
+   "kind": "命令",
+   "modified": "20260625",
+   "n": 30,
+   "file": "data/law/osh-edu.json",
+   "parent": "osh"
+  },
+  {
+   "id": "osh-health",
+   "pcode": "N0060022",
+   "name": "勞工健康保護規則",
+   "short": "健康保護規則",
+   "alias": [
+    "勞工健康保護規則"
+   ],
+   "group": "職業安全衛生",
+   "kind": "命令",
+   "modified": "20260626",
+   "n": 21,
+   "file": "data/law/osh-health.json",
+   "parent": "osh"
+  },
+  {
+   "id": "osh-cons",
+   "pcode": "N0060014",
+   "name": "營造安全衛生設施標準",
+   "short": "營造標準",
+   "alias": [
+    "營造安全衛生設施標準"
+   ],
+   "group": "職業安全衛生",
+   "kind": "命令",
+   "modified": "20260630",
+   "n": 189,
+   "file": "data/law/osh-cons.json",
+   "parent": "osh"
+  },
+  {
+   "id": "lsa",
+   "pcode": "N0030001",
+   "name": "勞動基準法",
+   "short": "勞基法",
+   "alias": [
+    "勞動基準法",
+    "勞基法"
+   ],
+   "group": "勞動法",
+   "kind": "法律",
+   "modified": "20240731",
+   "n": 98,
+   "file": "data/law/lsa.json"
+  },
+  {
+   "id": "lsa-r",
+   "pcode": "N0030002",
+   "name": "勞動基準法施行細則",
+   "short": "勞基法細則",
+   "alias": [
+    "勞動基準法施行細則"
+   ],
+   "group": "勞動法",
+   "kind": "命令",
+   "modified": "20240327",
+   "n": 70,
+   "file": "data/law/lsa-r.json",
+   "parent": "lsa"
+  },
+  {
+   "id": "lia",
+   "pcode": "N0070001",
+   "name": "勞動檢查法",
+   "short": "勞檢法",
+   "alias": [
+    "勞動檢查法",
+    "勞檢法"
+   ],
+   "group": "勞動法",
+   "kind": "法律",
+   "modified": "20200610",
+   "n": 40,
+   "file": "data/law/lia.json"
+  },
+  {
+   "id": "oia",
+   "pcode": "N0050031",
+   "name": "勞工職業災害保險及保護法",
+   "short": "災保法",
+   "alias": [
+    "勞工職業災害保險及保護法",
+    "災保法"
+   ],
+   "group": "勞動法",
+   "kind": "法律",
+   "modified": "20210430",
+   "n": 109,
+   "file": "data/law/oia.json"
+  },
+  {
+   "id": "gee",
+   "pcode": "N0030014",
+   "name": "性別平等工作法",
+   "short": "性平工作法",
+   "alias": [
+    "性別平等工作法",
+    "性別工作平等法"
+   ],
+   "group": "勞動法",
+   "kind": "法律",
+   "modified": "20230816",
+   "n": 50,
+   "file": "data/law/gee.json"
+  },
+  {
+   "id": "apa",
+   "pcode": "A0030210",
+   "name": "行政罰法",
+   "short": "行政罰法",
+   "alias": [
+    "行政罰法"
+   ],
+   "group": "基本法",
+   "kind": "法律",
+   "modified": "20220615",
+   "n": 46,
+   "file": "data/law/apa.json"
+  },
+  {
+   "id": "crim",
+   "pcode": "C0000001",
+   "name": "中華民國刑法",
+   "short": "刑法",
+   "alias": [
+    "中華民國刑法",
+    "刑法"
+   ],
+   "group": "基本法",
+   "kind": "法律",
+   "modified": "20260722",
+   "n": 422,
+   "file": "data/law/crim.json"
+  },
+  {
+   "id": "civil",
+   "pcode": "B0000001",
+   "name": "民法",
+   "short": "民法",
+   "alias": [
+    "民法"
+   ],
+   "group": "基本法",
+   "kind": "法律",
+   "modified": "20260817",
+   "n": 1439,
+   "file": "data/civil.json",
+   "rulings": "data/rulings.json"
+  }
+ ]
+}

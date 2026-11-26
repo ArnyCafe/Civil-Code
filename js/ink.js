@@ -1,18 +1,24 @@
-// 手寫註記：在條文上以 Apple Pencil 書寫。座標以「字級 em」為單位儲存，字級改變時仍可對齊。
-const PEN_W = { 細: 0.07, 中: 0.11, 粗: 0.17 };
+// 手寫註記：在條文上以 Apple Pencil 書寫。
+// 座標以「字級 em」為單位儲存（相對於該條 .atext 左上角），字級改變時仍可對齊。
+// 筆寬以公釐（CSS mm）設定，最細 0.05 mm；儲存時換算成 em。
+const PX_PER_MM = 96 / 25.4;
+export const PRESETS = [0.05, 0.1, 0.2, 0.3, 0.5, 0.8, 1.2, 2];
+export const COLORS = ['red', 'blue', 'black', 'green', 'mark', 'markp'];
 
 export class Ink {
-  constructor({ getRec, saveRec, onChange }) {
+  constructor({ getRec, saveRec, onChange, onSticky }) {
     this.getRec = getRec;
     this.saveRec = saveRec;
     this.onChange = onChange || (() => {});
+    this.onSticky = onSticky || (() => {});
     this.active = false;
     this.finger = false;
-    this.tool = 'pen';
-    this.color = 'ink';
-    this.width = '中';
+    this.tool = 'pen';        // pen | marker | eraser | sticky
+    this.color = 'red';
+    this.mm = 0.3;            // 筆寬（公釐）
+    this.pressure = true;     // 筆壓
     this.undo = [];
-    this.layers = new Map(); // aid -> {canvas, host}
+    this.layers = new Map();  // aid -> {canvas, host}
     this.ro = new ResizeObserver((ents) => {
       for (const e of ents) {
         const aid = e.target.closest('.art')?.dataset.id;
@@ -29,24 +35,32 @@ export class Ink {
 
   colors() {
     const cs = getComputedStyle(document.documentElement);
-    return {
-      ink: cs.getPropertyValue('--pen-ink').trim(),
-      red: cs.getPropertyValue('--pen-red').trim(),
-      green: cs.getPropertyValue('--pen-green').trim(),
-      mark: cs.getPropertyValue('--pen-mark').trim(),
-    };
+    const v = (k) => cs.getPropertyValue(k).trim();
+    return { red: v('--pen-red'), blue: v('--pen-ink'), ink: v('--pen-ink'), black: v('--pen-black'), green: v('--pen-green'), mark: v('--pen-mark'), markp: v('--pen-markp') };
   }
 
   observe(artEl) { this.io.observe(artEl); }
 
+  // 切換法典時清除
+  reset() {
+    this.io.disconnect();
+    this.ro.disconnect();
+    for (const L of this.layers.values()) L.canvas.remove();
+    this.layers.clear();
+    this.undo = [];
+  }
+
   setActive(on) {
     this.active = on;
     document.body.classList.toggle('inking', on);
-    if (on) document.querySelectorAll('.art').forEach((el) => {
+    document.body.dataset.tool = this.tool;
+    if (on) document.querySelectorAll('#reader .art').forEach((el) => {
       const r = el.getBoundingClientRect();
       if (r.bottom > -600 && r.top < innerHeight + 600) this.attach(el.dataset.id);
     });
   }
+
+  setTool(t) { this.tool = t; document.body.dataset.tool = t; }
 
   attach(aid) {
     const rec = this.getRec(aid);
@@ -74,9 +88,8 @@ export class Ink {
   }
 
   refresh(aid) {
-    // 條文重新繪製後呼叫
     const L = this.layers.get(aid);
-    if (L) { this.ro.unobserve(L.host); this.layers.delete(aid); }
+    if (L) { this.ro.unobserve(L.host); L.canvas.remove(); this.layers.delete(aid); }
     this.attach(aid);
   }
 
@@ -101,8 +114,7 @@ export class Ink {
     const strokes = (rec && rec.ink && rec.ink.strokes) || [];
     const em = this.em(host);
     const col = this.colors();
-    const all = live ? strokes.concat([live]) : strokes;
-    for (const s of all) this.paint(ctx, s, em, col);
+    for (const s of live ? strokes.concat([live]) : strokes) this.paint(ctx, s, em, col);
   }
 
   paint(ctx, s, em, col) {
@@ -110,46 +122,53 @@ export class Ink {
     if (p.length < 3) return;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
+    const X = (i) => p[i] * em, Y = (i) => p[i + 1] * em;
     if (s.t === 'marker') {
       ctx.save();
       ctx.globalCompositeOperation = 'multiply';
-      ctx.strokeStyle = col.mark;
-      ctx.lineWidth = 0.95 * em;
+      ctx.strokeStyle = col[s.c] || col.mark;
+      ctx.lineWidth = (s.w || 0.95) * em;
       ctx.lineCap = 'butt';
       ctx.beginPath();
-      ctx.moveTo(p[0] * em, p[1] * em);
-      for (let i = 3; i < p.length; i += 3) ctx.lineTo(p[i] * em, p[i + 1] * em);
+      ctx.moveTo(X(0), Y(0));
+      for (let i = 3; i < p.length; i += 3) ctx.lineTo(X(i), Y(i));
       ctx.stroke();
       ctx.restore();
       return;
     }
-    ctx.strokeStyle = col[s.c] || col.ink;
+    ctx.strokeStyle = col[s.c] || col.red;
+    ctx.fillStyle = ctx.strokeStyle;
+    const base = s.w * em;
+    const width = (pr) => Math.max(0.2, s.np ? base : base * (0.55 + 0.9 * pr));
     if (p.length === 3) {
-      ctx.fillStyle = ctx.strokeStyle;
-      ctx.beginPath(); ctx.arc(p[0] * em, p[1] * em, s.w * em * 0.5, 0, 7); ctx.fill();
+      ctx.beginPath(); ctx.arc(X(0), Y(0), width(p[2]) / 2, 0, 7); ctx.fill();
       return;
     }
+    // 以中點二次曲線平滑；每段依筆壓調整粗細
+    let px = X(0), py = Y(0);
     for (let i = 3; i < p.length; i += 3) {
-      const pr = (p[i + 2] + p[i - 1]) / 2;
-      ctx.lineWidth = Math.max(0.6, s.w * em * (0.45 + 0.9 * pr));
+      const last = i + 3 >= p.length;
+      const mx = last ? X(i) : (X(i) + X(i + 3)) / 2;
+      const my = last ? Y(i) : (Y(i + 1) + Y(i + 4)) / 2;
+      ctx.lineWidth = width((p[i + 2] + p[i - 1]) / 2);
       ctx.beginPath();
-      ctx.moveTo(p[i - 3] * em, p[i - 2] * em);
-      ctx.lineTo(p[i] * em, p[i + 1] * em);
+      ctx.moveTo(px, py);
+      ctx.quadraticCurveTo(X(i), Y(i), mx, my);
       ctx.stroke();
+      px = mx; py = my;
     }
   }
 
   bind(canvas, aid, host) {
     const allowed = (e) => this.active && (e.pointerType === 'pen' || e.pointerType === 'mouse' || this.finger);
-    // iPad Safari：阻止 Apple Pencil 觸發捲動，但手指仍可捲動
-    const blockStylus = (e) => {
+    // iPad Safari：Apple Pencil 書寫時不捲動；書寫中也忽略手掌觸碰
+    const block = (e) => {
       if (!this.active) return;
-      for (const t of e.touches) {
-        if (t.touchType === 'stylus' || this.finger) { e.preventDefault(); return; }
-      }
+      if (this.drawing) { e.preventDefault(); return; }
+      for (const t of e.touches) if (t.touchType === 'stylus' || this.finger) { e.preventDefault(); return; }
     };
-    canvas.addEventListener('touchstart', blockStylus, { passive: false });
-    canvas.addEventListener('touchmove', blockStylus, { passive: false });
+    canvas.addEventListener('touchstart', block, { passive: false });
+    canvas.addEventListener('touchmove', block, { passive: false });
 
     let cur = null, em = 18, rect = null;
     const pt = (e) => {
@@ -160,12 +179,17 @@ export class Ink {
     canvas.addEventListener('pointerdown', (e) => {
       if (!allowed(e)) return;
       e.preventDefault();
-      canvas.setPointerCapture(e.pointerId);
       rect = host.getBoundingClientRect();
       em = this.em(host);
+      if (this.tool === 'sticky') { const q = pt(e); this.onSticky(aid, q[0], q[1]); return; }
+      canvas.setPointerCapture(e.pointerId);
       this.drawing = aid;
       if (this.tool === 'eraser') { cur = { eraser: true }; this.erase(aid, pt(e)); return; }
-      cur = { t: this.tool === 'marker' ? 'marker' : 'pen', c: this.color, w: PEN_W[this.width], pts: pt(e) };
+      const marker = this.tool === 'marker';
+      cur = marker
+        ? { t: 'marker', c: this.color.startsWith('mark') ? this.color : 'mark', w: 0.95, pts: pt(e) }
+        : { t: 'pen', c: this.color.startsWith('mark') ? 'red' : this.color, w: Math.round((this.mm * PX_PER_MM / em) * 10000) / 10000, mm: this.mm, pts: pt(e) };
+      if (!marker && !this.pressure) cur.np = 1;
     });
     canvas.addEventListener('pointermove', (e) => {
       if (!cur) return;
@@ -176,7 +200,7 @@ export class Ink {
         if (cur.eraser) { this.erase(aid, q); continue; }
         const n = cur.pts.length;
         const dx = q[0] - cur.pts[n - 3], dy = q[1] - cur.pts[n - 2];
-        if (dx * dx + dy * dy < 0.0004) continue;
+        if (dx * dx + dy * dy < 0.0002) continue;
         cur.pts.push(...q);
       }
       if (!cur.eraser) this.draw(aid, cur);
@@ -203,7 +227,7 @@ export class Ink {
   erase(aid, [x, y]) {
     const rec = this.getRec(aid);
     if (!rec || !rec.ink) return;
-    const r2 = 0.5 * 0.5;
+    const r2 = 0.45 * 0.45;
     const keep = [];
     let removed = false;
     for (const s of rec.ink.strokes) {
@@ -254,5 +278,3 @@ export class Ink {
     return Math.abs(now - rec.ink.wem) / rec.ink.wem > 0.03;
   }
 }
-
-export const WIDTHS = Object.keys(PEN_W);
