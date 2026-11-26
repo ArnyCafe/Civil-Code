@@ -4,7 +4,7 @@ import re, sys, os
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 src = open(os.path.join(ROOT, 'index.html'), encoding='utf-8').read()
 body = src[src.index('<!--APP-START-->') + 16:src.index('<!--APP-END-->')]
-head = '''<title>民法註記本</title>
+head = '''<title>法典註記本</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&display=swap">
