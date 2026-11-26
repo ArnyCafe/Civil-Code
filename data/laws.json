@@ -1,0 +1,13 @@
+{
+  "default": "lpa",
+  "laws": [
+    { "id": "lpa", "name": "勞工退休金條例", "short": "勞退條例", "mark": "退", "file": "data/lpa.json", "rulings": "data/lpa-rulings.json",
+      "aliases": { "本條例": "lpa" }, "jump": ["勞工退休金條例", "勞退條例", "勞退"], "labor": true },
+    { "id": "lpar", "name": "勞工退休金條例施行細則", "short": "勞退細則", "mark": "細", "file": "data/lpar.json", "rulings": "data/lpar-rulings.json",
+      "aliases": { "本細則": "lpar", "本條例": "lpa" }, "jump": ["勞工退休金條例施行細則", "勞退細則", "細則"], "labor": true },
+    { "id": "lsa", "name": "勞動基準法", "short": "勞基法", "mark": "勞", "file": "data/lsa.json", "rulings": "data/lsa-rulings.json",
+      "aliases": { "本法": "lsa" }, "jump": ["勞動基準法", "勞基法"], "labor": true },
+    { "id": "civil", "name": "民法", "short": "民法", "mark": "民", "file": "data/civil.json", "rulings": "data/rulings.json",
+      "aliases": { "本法": "civil" }, "jump": ["民法"] }
+  ]
+}
