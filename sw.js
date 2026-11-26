@@ -1,9 +1,38 @@
 // 離線快取：程式檔採「先網路後快取」，確保更新；離線時使用快取
-const CACHE = 'civil-code-v1';
+const CACHE = 'law-notes-v2';
 const CORE = [
-  './', 'index.html', 'css/app.css', 'js/app.js', 'js/store.js', 'js/diff.js', 'js/ink.js',
-  'data/civil.json', 'data/rulings.json', 'manifest.webmanifest',
-  'icons/icon.svg', 'icons/apple-touch-icon.png', 'icons/icon-192.png', 'icons/icon-512.png',
+  './',
+  'index.html',
+  'css/app.css',
+  'js/app.js',
+  'js/store.js',
+  'js/diff.js',
+  'js/ink.js',
+  'js/xref.js',
+  'data/laws.json',
+  'data/xref.json',
+  'manifest.webmanifest',
+  'icons/icon.svg',
+  'icons/apple-touch-icon.png',
+  'icons/icon-192.png',
+  'icons/icon-512.png',
+  'data/law/osh.json',
+  'data/extra/osh.json',
+  'data/law/osh-r.json',
+  'data/law/osh-fac.json',
+  'data/law/osh-mgmt.json',
+  'data/law/osh-edu.json',
+  'data/law/osh-health.json',
+  'data/law/osh-cons.json',
+  'data/law/lsa.json',
+  'data/law/lsa-r.json',
+  'data/law/lia.json',
+  'data/law/oia.json',
+  'data/law/gee.json',
+  'data/law/apa.json',
+  'data/law/crim.json',
+  'data/civil.json',
+  'data/rulings.json',
 ];
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => Promise.all(CORE.map((u) => c.add(u).catch(() => {})))).then(() => self.skipWaiting()));
