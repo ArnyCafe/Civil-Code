@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """
-從「全國法規資料庫」(law.moj.gov.tw) 下載民法現行條文與歷次修正版本，
-產生 data/civil.json（條文、目錄、各條文新舊版本沿革）。
+從「全國法規資料庫」(law.moj.gov.tw) 下載法律現行條文與歷次修正版本，
+產生 data/<pcode>.json（條文、目錄、條旨、各條文新舊版本沿革）。
 
 用法：
-    python3 tools/build_data.py            # 下載（有快取）並建立資料
-    python3 tools/build_data.py --refresh  # 重新下載現行條文
+    python3 tools/build_data.py                    # data/laws.json 列出的全部法律
+    python3 tools/build_data.py B0010004           # 只建立強制執行法
+    python3 tools/build_data.py --refresh ...      # 重新下載現行條文
 
+條旨（條號下方括號內的要旨）放在 tools/captions/<pcode>.json。
 需求：Python 3.8+、curl（無第三方套件）
 """
 import difflib
@@ -23,8 +25,9 @@ from datetime import datetime, timezone
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE = os.path.join(ROOT, ".cache")
-OUT = os.path.join(ROOT, "data", "civil.json")
-PCODE = "B0000001"
+REGISTRY = os.path.join(ROOT, "data", "laws.json")
+# 已公布但尚未施行的條文（全國法規資料庫已換成新條文）
+PENDING = {"B0000001": {"1223": "20260817"}}
 API = "https://law.moj.gov.tw/api/Ch/Law/JSON"
 OLDVER = "https://law.moj.gov.tw/LawClass/LawOldVer.aspx?pcode={p}&lnndate={d}&lser={s}"
 
@@ -57,18 +60,28 @@ def fetch(url, path, tries=5):
     raise RuntimeError("下載失敗：" + url)
 
 
-def load_current(refresh=False):
-    zp = os.path.join(CACHE, "ChLaw.zip")
-    if refresh and os.path.exists(zp):
-        os.remove(zp)
-    fetch(API, zp)
-    with zipfile.ZipFile(zp) as z:
-        raw = z.read("ChLaw.json").decode("utf-8-sig")
-    data = json.loads(raw)
+_ALL = None
+
+
+def load_all(refresh=False):
+    global _ALL
+    if _ALL is None:
+        zp = os.path.join(CACHE, "ChLaw.zip")
+        if refresh and os.path.exists(zp):
+            os.remove(zp)
+        fetch(API, zp)
+        with zipfile.ZipFile(zp) as z:
+            raw = z.read("ChLaw.json").decode("utf-8-sig")
+        _ALL = json.loads(raw)
+    return _ALL
+
+
+def load_current(pcode, refresh=False):
+    data = load_all(refresh)
     for law in data["Laws"]:
-        if law["LawURL"].endswith("pcode=" + PCODE):
+        if law["LawURL"].endswith("pcode=" + pcode):
             return law, data.get("UpdateDate", "")
-    raise RuntimeError("找不到民法")
+    raise RuntimeError("找不到法規 " + pcode)
 
 
 def history_dates(hist):
@@ -197,10 +210,11 @@ def art_key(aid):
     return (int(a), int(b or 0))
 
 
-def main():
-    refresh = "--refresh" in sys.argv
-    os.makedirs(os.path.join(CACHE, "ver"), exist_ok=True)
-    law, update_date = load_current(refresh)
+def build(pcode, refresh=False):
+    out_path = os.path.join(ROOT, "data", pcode + ".json")
+    ver_dir = os.path.join(CACHE, "ver", pcode)
+    os.makedirs(ver_dir, exist_ok=True)
+    law, update_date = load_current(pcode, refresh)
 
     # ---- 現行條文與目錄 ----
     headings, articles = [], []
@@ -234,13 +248,13 @@ def main():
     versions = []
     for d in dates:
         for ser in ("001", "002"):
-            path = os.path.join(CACHE, "ver", "%s_%s.html" % (d, ser))
+            path = os.path.join(ver_dir, "%s_%s.html" % (d, ser))
             if not (os.path.exists(path) and os.path.getsize(path) > 2000):
                 if os.path.exists(path + ".none"):
                     continue
                 try:
                     subprocess.run(["curl", "-sS", "-m", "90", "-o", path,
-                                    OLDVER.format(p=PCODE, d=d, s=ser)], check=True)
+                                    OLDVER.format(p=pcode, d=d, s=ser)], check=True)
                     time.sleep(1)
                 except subprocess.CalledProcessError:
                     time.sleep(5)
@@ -287,10 +301,16 @@ def main():
                     history[aid].append({"d": d, "p": paras, "k": k})
             last[aid] = n
     if unlisted:
-        print("注意：以下變動未見於沿革條號清單（仍列入）：", unlisted)
-    # 第一個版本視為「制定」
+        print("注意：%d 項變動未見於沿革條號清單（多為全文修正，仍列入）" % len(unlisted))
+    # 制定時即有的條文視為「制定」
+    orig_dates = set()
+    for it in items:
+        if "制定" in it["text"]:
+            orig_dates.update(it["dates"])
+    if not orig_dates and dates:
+        orig_dates.add(dates[0])
     for aid, hs in history.items():
-        if hs[0]["d"] in dates[:7]:
+        if hs[0]["d"] in orig_dates:
             hs[0]["k"] = "orig"
 
     # 對應沿革項目
@@ -312,18 +332,36 @@ def main():
             a["since"] = hs[0]["d"]
             a["last"] = hs[-1]["d"]
 
+    # 條旨
+    cap_path = os.path.join(ROOT, "tools", "captions", pcode + ".json")
+    if os.path.exists(cap_path):
+        caps = json.load(open(cap_path, encoding="utf-8"))
+        missing = [a["id"] for a in articles if a["id"] not in caps]
+        for a in articles:
+            if caps.get(a["id"]):
+                a["c"] = caps[a["id"]]
+        if missing:
+            print("注意：缺少條旨：", missing)
+
+    # 目錄層級從 0 起算（強制執行法只有章、節，沒有編）
+    if headings:
+        base = min(h["lv"] for h in headings)
+        for h in headings:
+            h["lv"] -= base
+
     eff_note = re.sub(r"\s*\r?\n\s*", "", law["LawEffectiveNote"])
+    pend = {aid: d for aid, d in PENDING.get(pcode, {}).items() if aid in changed}
     out = {
         "meta": {
             "name": law["LawName"],
             "eng": law.get("EngLawName", ""),
-            "pcode": PCODE,
+            "pcode": pcode,
             "modified": law["LawModifiedDate"],
             "effectiveNote": eff_note,
             "source": "全國法規資料庫 law.moj.gov.tw（法務部）",
             "sourceUpdate": update_date,
             "built": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-            "pending": {"1223": "20260817"} if "1223" in changed else {},
+            "pending": pend,
         },
         "histories": [{"n": it["n"], "t": it["text"], "dates": it["dates"]} for it in items],
         "versions": ver_list,
@@ -332,11 +370,20 @@ def main():
         "changes": {aid: [{"d": h["d"], "k": h["k"], "p": h["p"]} for h in hs]
                     for aid, hs in sorted(changed.items(), key=lambda x: art_key(x[0]))},
     }
-    os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    with open(OUT, "w", encoding="utf-8") as f:
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    with open(out_path, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
-    print("完成：%d 條、%d 條有修正沿革、%d 個版本 → %s (%.0f KB)" % (
-        len(articles), len(changed), len(ver_list), OUT, os.path.getsize(OUT) / 1024))
+    print("完成 %s：%d 條、%d 條有修正沿革、%d 個版本 → %s (%.0f KB)" % (
+        law["LawName"], len(articles), len(changed), len(ver_list), out_path, os.path.getsize(out_path) / 1024))
+
+
+def main():
+    refresh = "--refresh" in sys.argv
+    codes = [a for a in sys.argv[1:] if not a.startswith("--")]
+    if not codes:
+        codes = [l["pcode"] for l in json.load(open(REGISTRY, encoding="utf-8"))["laws"]]
+    for i, pcode in enumerate(codes):
+        build(pcode, refresh and i == 0)
 
 
 def norm_all(m):

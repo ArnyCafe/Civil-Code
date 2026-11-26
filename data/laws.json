@@ -1,0 +1,32 @@
+{
+  "laws": [
+    {
+      "pcode": "B0010004",
+      "name": "強制執行法",
+      "short": "強執",
+      "mark": "執",
+      "aliases": ["強執", "執行法"],
+      "colorDepth": 2,
+      "main": true
+    },
+    {
+      "pcode": "B0010001",
+      "name": "民事訴訟法",
+      "short": "民訴",
+      "mark": "訴",
+      "aliases": ["民訴"],
+      "colorDepth": 1
+    },
+    {
+      "pcode": "B0000001",
+      "name": "民法",
+      "short": "民法",
+      "mark": "民",
+      "aliases": [],
+      "colorDepth": 1
+    }
+  ],
+  "aliases": {
+    "刑法": "中華民國刑法"
+  }
+}
