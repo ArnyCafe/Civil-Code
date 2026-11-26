@@ -1,0 +1,18 @@
+{
+  "name": "勞動事件法註記本",
+  "short_name": "勞動事件法",
+  "description": "勞動事件法全文，可用 Apple Pencil 手寫、紅色小字註記，收錄立法理由、修正理由、新舊條文對照、重要裁判與引用法條。",
+  "lang": "zh-Hant-TW",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fdfcf9",
+  "theme_color": "#1d5a6b",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

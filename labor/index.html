@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>勞動事件法註記本</title>
+<meta name="description" content="勞動事件法全文，可用 Apple Pencil 手寫與紅色小字註記，收錄立法理由、修正理由、新舊條文對照、最高法院重要裁判、司法院問答及引用法條。">
+<meta name="theme-color" content="#f2f0ec" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#15171b" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="勞動事件法">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<!--APP-START-->
+<div id="app" class="app">
+  <header class="topbar">
+    <button class="icon-btn" id="btn-nav" aria-label="目錄" title="目錄">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+    </button>
+    <div class="brand">
+      <span class="brand-mark">勞</span>
+      <span class="brand-name">勞動事件法註記本</span>
+    </div>
+    <form class="searchbox" id="search-form" role="search" autocomplete="off">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+      <input type="search" id="q" placeholder="搜尋條文、理由、判決、註記，或輸入條號 37" enterkeyhint="search">
+    </form>
+    <button class="icon-btn" id="btn-ann" aria-pressed="true" title="隱藏我的註記" aria-label="顯示或隱藏我的註記">
+      <svg viewBox="0 0 24 24" aria-hidden="true" class="eye-on"><path d="M2.5 12s3.5-6.5 9.5-6.5S21.5 12 21.5 12s-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg>
+      <svg viewBox="0 0 24 24" aria-hidden="true" class="eye-off"><path d="M2.5 12s3.5-6.5 9.5-6.5c2 0 3.7.7 5.1 1.7M21.5 12s-3.5 6.5-9.5 6.5c-2 0-3.7-.7-5.1-1.7"/><path d="M4 20L20 4"/></svg>
+    </button>
+    <button class="icon-btn" id="btn-ink" aria-pressed="false" title="手寫模式（Apple Pencil）" aria-label="手寫模式">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1.2-4.4L15.6 5.2a2 2 0 0 1 2.8 0l.4.4a2 2 0 0 1 0 2.8L8.4 18.8z"/><path d="M13.5 7.3l3.2 3.2"/></svg>
+    </button>
+    <button class="icon-btn" id="btn-settings" aria-label="設定" title="設定與備份">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2.8v2.4M12 18.8v2.4M21.2 12h-2.4M5.2 12H2.8M18.5 5.5l-1.7 1.7M7.2 16.8l-1.7 1.7M18.5 18.5l-1.7-1.7M7.2 7.2L5.5 5.5"/></svg>
+    </button>
+  </header>
+
+  <aside class="sidebar" id="sidebar" aria-label="導覽">
+    <nav class="seg" role="tablist">
+      <button role="tab" data-side="toc" aria-selected="true">目錄</button>
+      <button role="tab" data-side="search" aria-selected="false">搜尋</button>
+      <button role="tab" data-side="mine" aria-selected="false">我的註記</button>
+    </nav>
+    <div class="side-body" id="side-toc"></div>
+    <div class="side-body" id="side-search" hidden></div>
+    <div class="side-body" id="side-mine" hidden></div>
+  </aside>
+  <div class="scrim" id="scrim" hidden></div>
+
+  <main class="reader" id="reader" tabindex="-1">
+    <div class="reader-inner" id="reader-inner">
+      <div class="loading" id="loading">載入條文中…</div>
+    </div>
+  </main>
+</div>
+
+<div class="inkbar" id="inkbar" hidden>
+  <div class="ink-row" role="toolbar" aria-label="手寫工具">
+    <button data-color="red" class="sw sw-red" title="紅筆"></button>
+    <button data-color="blue" class="sw sw-blue" title="藍筆"></button>
+    <button data-color="black" class="sw sw-black" title="黑筆"></button>
+    <button data-color="green" class="sw sw-green" title="綠筆"></button>
+    <button data-color="hly" class="sw sw-hly mk" title="黃色螢光筆"></button>
+    <button data-color="hlp" class="sw sw-hlp mk" title="粉色螢光筆"></button>
+    <button data-color="hlg" class="sw sw-hlg mk" title="綠色螢光筆"></button>
+    <button data-tool="eraser" class="tool-txt" aria-pressed="false" title="橡皮擦（擦除整筆）">擦</button>
+    <span class="ink-sep"></span>
+    <button data-act="undo" class="tool-txt" title="復原">↶</button>
+    <button data-act="redo" class="tool-txt" title="重做">↷</button>
+    <button data-act="finger" class="tool-txt" aria-pressed="false" title="允許手指書寫">手指</button>
+    <button data-act="done" class="tool-txt primary">完成</button>
+  </div>
+  <div class="ink-row width-row">
+    <span class="wlbl">筆寬</span>
+    <button data-act="thinner" class="tool-txt sm" title="變細">−</button>
+    <input type="range" id="pen-w" min="0.1" max="6" step="0.05" value="0.5" aria-label="筆寬">
+    <button data-act="thicker" class="tool-txt sm" title="變粗">＋</button>
+    <output id="pen-wv" class="wv">0.5</output>
+    <canvas id="pen-prev" class="pen-prev" aria-hidden="true"></canvas>
+    <button data-act="pressure" class="tool-txt" aria-pressed="true" title="依 Apple Pencil 壓力改變粗細">壓感</button>
+  </div>
+  <div class="ink-row presets" id="pen-presets"></div>
+</div>
+
+<div class="popover" id="sel-pop" hidden role="dialog" aria-label="註記">
+  <div class="pop-row">
+    <button data-mk="above" class="pop-txt red">上方註記</button>
+    <button data-mk="below" class="pop-txt red">下方註記</button>
+    <span class="pop-sep"></span>
+    <button data-mk="y" class="hl-sw hl-y" title="黃色螢光"></button>
+    <button data-mk="g" class="hl-sw hl-g" title="綠色螢光"></button>
+    <button data-mk="b" class="hl-sw hl-b" title="藍色螢光"></button>
+    <button data-mk="p" class="hl-sw hl-p" title="粉色螢光"></button>
+    <button data-mk="r" class="hl-sw hl-r" title="紅色底線">U</button>
+  </div>
+</div>
+<div class="popover" id="ann-pop" hidden role="dialog" aria-label="註記選單">
+  <div class="pop-note" id="ann-note"></div>
+  <div class="pop-row">
+    <button data-av="hide" class="pop-txt">隱藏</button>
+    <button data-av="edit" class="pop-txt">編輯</button>
+    <button data-av="pos" class="pop-txt">移到下方</button>
+    <span class="pop-sep"></span>
+    <button data-av="y" class="hl-sw hl-y" title="黃"></button>
+    <button data-av="g" class="hl-sw hl-g" title="綠"></button>
+    <button data-av="b" class="hl-sw hl-b" title="藍"></button>
+    <button data-av="p" class="hl-sw hl-p" title="粉"></button>
+    <button data-av="r" class="hl-sw hl-r" title="紅線">U</button>
+    <button data-av="del" class="pop-txt danger">刪除</button>
+  </div>
+</div>
+
+<dialog class="modal" id="modal">
+  <form method="dialog" class="modal-card" id="modal-form">
+    <header class="modal-head"><h2 id="modal-title"></h2><button class="icon-btn" value="cancel" aria-label="關閉"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></header>
+    <div class="modal-body" id="modal-body"></div>
+    <footer class="modal-foot" id="modal-foot"></footer>
+  </form>
+</dialog>
+<datalist id="tag-list"></datalist>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<!--APP-END-->
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
