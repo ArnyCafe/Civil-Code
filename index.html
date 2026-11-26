@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>民法註記本</title>
+<meta name="description" content="中華民國民法全文，可註記、手寫、收錄重要判解與函釋，並提供新舊條文對照。">
+<meta name="theme-color" content="#f3f5f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14181f" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="民法註記本">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<!--APP-START-->
+<div id="app" class="app">
+  <header class="topbar">
+    <button class="icon-btn" id="btn-nav" aria-label="目錄" title="目錄">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+    </button>
+    <div class="brand">
+      <span class="brand-mark">民</span>
+      <span class="brand-name">民法註記本</span>
+    </div>
+    <form class="searchbox" id="search-form" role="search" autocomplete="off">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+      <input type="search" id="q" placeholder="搜尋條文、判解、註記，或輸入條號 184-1" enterkeyhint="search">
+    </form>
+    <button class="icon-btn" id="btn-ink" aria-pressed="false" title="手寫模式（Apple Pencil）" aria-label="手寫模式">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1.2-4.4L15.6 5.2a2 2 0 0 1 2.8 0l.4.4a2 2 0 0 1 0 2.8L8.4 18.8z"/><path d="M13.5 7.3l3.2 3.2"/></svg>
+    </button>
+    <button class="icon-btn" id="btn-settings" aria-label="設定" title="設定與備份">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2.8v2.4M12 18.8v2.4M21.2 12h-2.4M5.2 12H2.8M18.5 5.5l-1.7 1.7M7.2 16.8l-1.7 1.7M18.5 18.5l-1.7-1.7M7.2 7.2L5.5 5.5"/></svg>
+    </button>
+  </header>
+
+  <aside class="sidebar" id="sidebar" aria-label="導覽">
+    <nav class="seg" role="tablist">
+      <button role="tab" data-side="toc" aria-selected="true">目錄</button>
+      <button role="tab" data-side="search" aria-selected="false">搜尋</button>
+      <button role="tab" data-side="mine" aria-selected="false">我的註記</button>
+    </nav>
+    <div class="side-body" id="side-toc"></div>
+    <div class="side-body" id="side-search" hidden></div>
+    <div class="side-body" id="side-mine" hidden></div>
+  </aside>
+  <div class="scrim" id="scrim" hidden></div>
+
+  <main class="reader" id="reader" tabindex="-1">
+    <div class="reader-inner" id="reader-inner">
+      <div class="loading" id="loading">載入條文中…</div>
+    </div>
+  </main>
+
+  <section class="detail" id="detail" aria-label="條文詳細" hidden>
+    <header class="detail-head">
+      <button class="icon-btn" id="d-close" aria-label="關閉">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <div class="d-title"><span id="d-no"></span><small id="d-path"></small></div>
+      <button class="icon-btn" id="d-prev" aria-label="上一條"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button class="icon-btn" id="d-next" aria-label="下一條"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+      <button class="icon-btn star-btn" id="d-star" aria-pressed="false" aria-label="加入書籤">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.8z"/></svg>
+      </button>
+    </header>
+    <div class="d-text" id="d-text"></div>
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-tab="rulings" aria-selected="true">判解・函釋 <b id="t-rulings"></b></button>
+      <button role="tab" data-tab="history" aria-selected="false">新舊對照 <b id="t-history"></b></button>
+      <button role="tab" data-tab="notes" aria-selected="false">我的註記 <b id="t-notes"></b></button>
+    </nav>
+    <div class="d-body" id="d-body"></div>
+  </section>
+</div>
+
+<div class="inkbar" id="inkbar" hidden>
+  <div class="ink-tools" role="toolbar" aria-label="手寫工具">
+    <button data-tool="pen" data-color="ink" class="sw sw-ink" aria-pressed="true" title="藍黑筆"></button>
+    <button data-tool="pen" data-color="red" class="sw sw-red" aria-pressed="false" title="紅筆"></button>
+    <button data-tool="pen" data-color="green" class="sw sw-green" aria-pressed="false" title="綠筆"></button>
+    <button data-tool="marker" data-color="mark" class="sw sw-mark" aria-pressed="false" title="螢光筆"></button>
+    <button data-tool="eraser" class="tool-txt" aria-pressed="false" title="橡皮擦">擦</button>
+    <span class="ink-sep"></span>
+    <button data-act="width" class="tool-txt" title="筆粗">中</button>
+    <button data-act="undo" class="tool-txt" title="復原">復原</button>
+    <button data-act="finger" class="tool-txt" aria-pressed="false" title="允許手指書寫">手指</button>
+    <button data-act="done" class="tool-txt primary">完成</button>
+  </div>
+  <p class="ink-hint">用 Apple Pencil 直接在條文上書寫；手指仍可捲動。</p>
+</div>
+
+<div class="popover" id="hl-pop" hidden role="dialog" aria-label="劃線與註記">
+  <div class="pop-note" id="pop-note" hidden></div>
+  <div class="pop-row">
+    <button data-hl="y" class="hl-sw hl-y" title="黃色螢光"></button>
+    <button data-hl="g" class="hl-sw hl-g" title="綠色螢光"></button>
+    <button data-hl="b" class="hl-sw hl-b" title="藍色螢光"></button>
+    <button data-hl="p" class="hl-sw hl-p" title="粉色螢光"></button>
+    <button data-hl="u" class="hl-sw hl-u" title="紅色底線">U</button>
+    <button data-hl="note" class="pop-txt">加註</button>
+    <button data-hl="del" class="pop-txt danger" hidden>刪除</button>
+  </div>
+</div>
+
+<dialog class="modal" id="modal">
+  <form method="dialog" class="modal-card" id="modal-form">
+    <header class="modal-head"><h2 id="modal-title"></h2><button class="icon-btn" value="cancel" aria-label="關閉"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></header>
+    <div class="modal-body" id="modal-body"></div>
+    <footer class="modal-foot" id="modal-foot"></footer>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<!--APP-END-->
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
