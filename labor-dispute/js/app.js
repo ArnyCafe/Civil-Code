@@ -625,7 +625,7 @@ function renderRefs(body) {
         <button class="linkish" data-act="ref-vis" data-id="${r.id}" style="margin-left:auto">${vis ? '條文中隱藏小字' : '條文中顯示小字'}</button></div>
         ${r.why ? `<div class="rsrc">${esc(r.why)}</div>` : ''}
         ${(items || []).map((it) => `<div class="rpart"><span class="lbl">第${esc(it.no)}條</span>${it.paras.map(esc).join('<br>')}</div>`).join('')}
-        ${law ? `<div class="rfoot"><button class="linkish" data-act="open-law" data-pc="${r.pcode}" data-no="${esc(r.flno || (r.flnos || [])[0] || '')}">${law.full ? '開啟' + esc(law.name) + '全文' : '全國法規資料庫'}</button><span class="rdate">${esc(law.name)} 修正 ${roc(law.modified, true)}</span></div>` : ''}</div>`;
+        ${law ? `<div class="rfoot">${law.full ? `<button class="linkish" data-act="open-law" data-pc="${r.pcode}" data-no="${esc(r.flno || (r.flnos || [])[0] || '')}">開啟${esc(law.name)}全文</button>` : `<a href="https://law.moj.gov.tw/LawClass/LawSingle.aspx?pcode=${r.pcode}&amp;flno=${esc(r.flno || (r.flnos || [])[0] || '')}" target="_blank" rel="noopener">全國法規資料庫</a>`}<span class="rdate">${esc(law.name)} 修正 ${roc(law.modified, true)}</span></div>` : ''}</div>`;
     }
     html += '</div>';
   }
@@ -1544,7 +1544,7 @@ function bind() {
     const act = b.dataset.act;
     if (act === 'add-item') editItem(current);
     else if (act === 'versions') openVersions();
-    else if (act === 'open-law') { const L = D.reflaws[b.dataset.pc]; if (L && L.full) openLaw(b.dataset.pc, b.dataset.no); else window.open(`https://law.moj.gov.tw/LawClass/LawSingle.aspx?pcode=${b.dataset.pc}&flno=${b.dataset.no}`, '_blank', 'noopener'); }
+    else if (act === 'open-law') openLaw(b.dataset.pc, b.dataset.no);
     else if (act === 'ref-vis') { toggleIds(current, [b.dataset.id], 'toggle'); renderRefs($('#d-body')); }
     else if (act === 'an-vis') { toggleIds(current, [b.dataset.id], 'toggle'); }
     else if (act === 'imp' && card) {
