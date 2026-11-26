@@ -1380,7 +1380,7 @@ function openSettings() {
       <div class="set-h">資料</div>
       <div class="meta-list">${REG.laws.map((l) => { const LD = LAWS.get(l.pcode); return `${esc(l.name)}：${LD ? `修正日期 ${roc(LD.meta.modified)}，${LD.versions.length} 個歷次版本` : '尚未載入'}`; }).join('<br>')}<br>
         條文、歷次版本、相關法條與判解（憲法法庭裁判、大法官解釋、判例${rCount ? `，已載入 ${rCount} 筆` : ''}）取自全國法規資料庫（法務部）。<br>
-        強制執行法之條旨與「參照」條文為編者整理，僅供參考。<br>
+        三部法律之條旨及強制執行法之「參照」條文為編者整理，僅供參考；條旨可在「我的註記」自行改寫。<br>
         本工具供學習參考，正式引用請以官方公布之法規與裁判全文為準。</div>
       <div class="row-actions" style="margin-top:10px"><button type="button" class="btn small" data-act="help">使用說明</button></div>
       <div class="set-h">危險區域</div>
