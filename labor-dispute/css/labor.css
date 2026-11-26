@@ -1,0 +1,149 @@
+/* 勞資爭議處理法註記本：紅色小字行間註記、相關法條小字、圈選模式 */
+:root {
+  --anno: #c62828;                 /* 紅字註記 */
+  --anno-soft: rgba(198, 40, 40, .09);
+  --anno-line: rgba(198, 40, 40, .55);
+  --ref: #3d6189;                  /* 相關法條小字 */
+  --ref-soft: #e6eef7;
+  --ref-line: rgba(61, 97, 137, .45);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="sepia"]) {
+    --anno: #ff8a80; --anno-soft: rgba(255, 138, 128, .12); --anno-line: rgba(255, 138, 128, .6);
+    --ref: #9dbbe0; --ref-soft: #1d2a3a; --ref-line: rgba(157, 187, 224, .45);
+  }
+}
+:root[data-theme="dark"] {
+  --anno: #ff8a80; --anno-soft: rgba(255, 138, 128, .12); --anno-line: rgba(255, 138, 128, .6);
+  --ref: #9dbbe0; --ref-soft: #1d2a3a; --ref-line: rgba(157, 187, 224, .45);
+}
+:root[data-theme="sepia"] { --anno: #b3261e; --ref: #3a5a7c; --ref-soft: #e3e3da; }
+
+/* ---------- 標題 ---------- */
+.law-title h1 { font: 700 1.45em/1.3 var(--font-law); letter-spacing: .14em; margin: 1.1em 0 .15em; }
+.law-title p { margin: 0 0 .6em; color: var(--faint); font: .72em/1.5 var(--font-ui); }
+.reader-inner > .h-chap { border-bottom: 1px solid var(--line); padding-bottom: .3em; }
+
+/* ---------- 行間紅字（ruby）---------- */
+ruby.an { ruby-align: center; cursor: pointer; white-space: nowrap; }
+ruby.an-above { ruby-position: over; -webkit-ruby-position: before; }
+ruby.an-below { ruby-position: under; -webkit-ruby-position: after; }
+ruby.an rt {
+  font: 600 .5em/1.15 var(--font-ui); color: var(--anno); letter-spacing: 0;
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+  padding: 0 .1em;
+}
+ruby.an.off rt { display: none; }
+ruby.an.off { text-decoration: underline dotted var(--anno-line); text-decoration-thickness: 1.5px; text-underline-offset: .3em; }
+
+/* 段落上／下方的紅字註記列（較長的註記） */
+.pw { position: relative; }
+.band {
+  display: flex; flex-wrap: wrap; gap: .05em .9em;
+  margin-left: 1.6em; color: var(--anno);
+  font: 500 .6em/1.5 var(--font-ui);
+}
+.pw.k .band, .pw.k .rfband { margin-left: 3.8em; }
+.no-pn .band, .no-pn .rfband { margin-left: 0; }
+.no-pn .pw.k .band, .no-pn .pw.k .rfband { margin-left: 2.2em; }
+.band.above { margin-bottom: .1em; padding-top: .15em; }
+.band.below { margin-top: -.05em; margin-bottom: .3em; }
+.band:not(:has(.an-n:not(.off))) { display: none; }
+.an-n { cursor: pointer; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; white-space: pre-wrap; overflow-wrap: anywhere; }
+.an-n b { font-weight: 700; margin-right: .2em; }
+.an-n.off { display: none; }
+.an-u { cursor: pointer; text-decoration: underline solid var(--anno-line); text-decoration-thickness: 1px; text-underline-offset: .3em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.an-u.off { text-decoration-style: dotted; text-decoration-thickness: 1.5px; }
+.an-m { cursor: pointer; color: var(--anno); font: 700 .55em/1 var(--font-ui); margin: 0 .05em; vertical-align: .6em; }
+.an-m.off { opacity: .5; }
+.hl.hl-u { text-decoration-color: var(--anno); }
+
+/* ---------- 相關法條小字 ---------- */
+.lref { cursor: pointer; text-decoration: underline dotted var(--ref-line); text-decoration-thickness: 1.5px; text-underline-offset: .3em; }
+.lref:not(.off) { text-decoration-style: solid; text-decoration-thickness: 1px; }
+.rfband { display: flex; flex-direction: column; align-items: flex-start; gap: .25em; margin: .1em 0 .45em 1.6em; }
+.rf {
+  display: block; max-width: 100%; cursor: pointer;
+  border-left: 2px solid var(--ref-line); padding: .05em 0 .05em .6em;
+  font: .62em/1.6 var(--font-law); color: var(--ref);
+}
+.rf-h { font: 600 1em/1.6 var(--font-ui); margin-right: .5em; }
+.rf-h i { font-style: normal; font-weight: 400; opacity: .8; }
+.rf-t { display: block; }
+.rf-t + .rf-t { margin-top: .15em; }
+.rf-t.clamp { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.rf-more { border: 0; background: none; padding: 0; color: var(--ref); font: 600 .95em/1.4 var(--font-ui); text-decoration: underline; text-underline-offset: .2em; }
+.rf.extra { border-left-style: dashed; }
+button.rf.off {
+  border: 1px dashed var(--ref-line); border-radius: 999px; background: transparent;
+  padding: .05em .7em; font: .56em/1.6 var(--font-ui); color: var(--ref);
+}
+
+/* ---------- 條文標頭 chips ---------- */
+.chip.c-anno { background: var(--anno-soft); color: var(--anno); font-weight: 600; cursor: pointer; }
+.chip.c-anno:not(.on) { background: transparent; box-shadow: inset 0 0 0 1px var(--anno-line); }
+.chip.c-anno i { font-style: normal; font-weight: 400; opacity: .8; }
+.chip.c-ref { background: var(--ref-soft); color: var(--ref); }
+.note-peek { cursor: pointer; }
+
+/* ---------- 工具列 ---------- */
+.anno-btn { width: auto; padding: 0 9px 0 7px; display: inline-flex; gap: 3px; color: var(--anno); }
+.anno-btn .btn-lbl { font: 700 14px/1 var(--font-law); }
+.anno-btn[aria-pressed="true"] { background: var(--anno); color: var(--page); }
+.anno-btn[aria-pressed="false"] .chk { display: none; }
+.anno-btn[aria-pressed="false"] .btn-lbl { text-decoration: line-through; }
+#btn-lasso[aria-pressed="true"] { background: var(--anno); color: var(--page); }
+
+/* ---------- 圈選模式 ---------- */
+.lasso-layer { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 45; }
+.lassobar {
+  position: fixed; z-index: 50; left: 50%; transform: translateX(-50%);
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  background: var(--raise); border: 1px solid var(--anno-line); border-radius: 16px; box-shadow: var(--shadow);
+  padding: 8px 10px 6px;
+}
+body.lassoing .reader, body.lassoing .d-text { cursor: crosshair; }
+body.lassoing .art, body.lassoing .d-text { -webkit-user-select: none; user-select: none; }
+body.lassoing .art .atext { outline: 1px dashed var(--anno-line); outline-offset: 4px; border-radius: 4px; }
+body.lassoing.lasso-finger .reader { touch-action: none; }
+
+/* ---------- 側欄目錄 ---------- */
+.toc-arts { display: flex; flex-wrap: wrap; gap: 4px; padding: 2px 8px 10px 30px; }
+.toc-a {
+  min-width: 2.7em; border: 0; border-radius: 6px; padding: 4px 6px;
+  background: var(--raise); box-shadow: 0 0 0 1px var(--line-soft);
+  font: 12px/1.2 var(--font-num); color: var(--muted); font-variant-numeric: tabular-nums;
+}
+.toc-a:hover { color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+
+/* ---------- 判決・函釋 ---------- */
+.tp-P { background: var(--seal-soft); color: var(--seal); }
+.tp-F { background: var(--amber-soft); color: var(--amber); }
+.tp-L { background: var(--ref-soft); color: var(--ref); }
+.rpoint { margin-top: 7px; font-size: 14px; font-weight: 600; line-height: 1.6; }
+.rsrc { margin-top: 6px; font-size: 12px; color: var(--faint); line-height: 1.55; }
+.refcard { background: var(--raise); border: 1px solid var(--line-soft); border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; }
+.refcard .rpart { font-size: 14.5px; }
+
+/* ---------- 註記編輯 ---------- */
+textarea.note.red, .red-note, .hl-list .n.red { color: var(--anno); }
+.red-note { font-size: 15px; line-height: 1.7; white-space: pre-wrap; }
+.pop-txt.red { color: var(--anno); border-color: var(--anno-line); font-weight: 700; }
+.hl-list mark.hl-none { background: none; text-decoration: underline dotted var(--anno-line); text-underline-offset: .25em; }
+#hl-pop .ink-sep { height: 22px; }
+
+/* ---------- 條文預覽、版本全文 ---------- */
+.xpop { max-width: min(460px, calc(100vw - 16px)); }
+.x-body { font-size: 15px; max-height: 42vh; overflow-y: auto; padding: 6px 6px 2px; }
+.x-body > b { display: block; color: var(--accent); font: 700 15px/1.4 var(--font-law); margin-bottom: 2px; }
+.x-body .atext { line-height: 1.8; }
+.ver-text { font-family: var(--font-law); }
+.ver-art { margin: 0 0 12px; font-size: 15px; line-height: 1.8; scroll-margin: 20px; border-radius: 8px; }
+.ver-art b { color: var(--accent); }
+.ver-art p { margin: 0; }
+.ver-art.flash { animation: flash 1.6s ease-out; }
+.ver-ch { font: 600 15px/1.4 var(--font-law); margin: 16px 0 6px; color: var(--muted); }
+
+@media print {
+  .lassobar, .lasso-layer { display: none !important; }
+}

@@ -1,0 +1,18 @@
+{
+  "name": "勞資爭議處理法註記本",
+  "short_name": "勞資爭議法",
+  "description": "勞資爭議處理法全文，紅色小字行間註記、重要判決與函釋、新舊條文對照、相關法條。",
+  "lang": "zh-Hant-TW",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fbfcfd",
+  "theme_color": "#8e1f1f",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
