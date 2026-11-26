@@ -859,7 +859,8 @@ function openSettings() {
         新舊對照：比對全國法規資料庫歷次版本（${D.versions.length} 個版本）。<br>
         判解：全國法規資料庫各條「憲法法庭裁判」「大法官解釋」「判例」${R ? `，共 ${Object.values(R).reduce((s, v) => s + v.length, 0)} 筆` : '（未載入）'}。<br>
         ${esc(D.meta.effectiveNote)}<br>
-        本工具供學習參考，正式引用請以官方公布之法規與裁判全文為準。</div>
+        本工具供學習參考，正式引用請以官方公布之法規與裁判全文為準。<br>
+        <a href="ccp/" style="color:var(--accent)">開啟民事訴訟法註記本 ↗</a></div>
       <div class="set-h">危險區域</div>
       <div class="row-actions"><input class="inp" id="wipe-confirm" placeholder="輸入「清除」以刪除全部註記" style="max-width:260px"><button type="button" class="btn small danger" data-act="wipe">刪除全部註記</button></div>`,
     buttons: [{ label: '完成', cls: 'primary' }],
